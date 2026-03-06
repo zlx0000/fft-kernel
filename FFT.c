@@ -37,7 +37,7 @@ float complex *FFT_SIMD(float complex *a, size_t n)
         uint32_t m = 1 << i;
         float complex w_m = cexp(-2.0 * I * M_PI / m);
         float complex w_m_8 = w_m * w_m * w_m * w_m
-                             * w_m * w_m * w_m * w_m;
+                            * w_m * w_m * w_m * w_m;
         __m256 w_m_re_vec_8 = _mm256_set1_ps(creal(w_m_8));
         __m256 w_m_im_vec_8 = _mm256_set1_ps(cimag(w_m_8));
         for (uint32_t j = 0; j <= n-1; j+=m) {
@@ -112,8 +112,8 @@ float complex *IFFT_SIMD(float complex *a, size_t n)
     for (uint32_t i = 1; i <= (uint32_t)log2(n); i++) {
         uint32_t m = 1 << i;
         float complex w_m = cexp(2.0 * I * M_PI / m);
-        float complex w_m_8 = w_m * w_m * w_m *
-                            w_m * w_m * w_m * w_m * w_m;
+        float complex w_m_8 = w_m * w_m * w_m * w_m
+                            * w_m * w_m * w_m * w_m;
         __m256 w_m_re_vec_8 = _mm256_set1_ps(creal(w_m_8));
         __m256 w_m_im_vec_8 = _mm256_set1_ps(cimag(w_m_8));
         for (uint32_t j = 0; j <= n-1; j+=m) {

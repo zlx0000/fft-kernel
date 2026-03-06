@@ -14,10 +14,13 @@ int main()
             A[i] = 0.0 + 0.0 * I;
         }
     }
-    A = IFFT_SIMD(FFT_SIMD(A, n), n);
-    for (size_t i = 0; i < n; i++) {
-        printf("%f + %fi\n", crealf(A[i]), cimagf(A[i]));
-    }
+    float complex *B = FFT_SIMD(A, n);
     _mm_free(A);
+    float complex *C = IFFT_SIMD(B, n);
+    _mm_free(B);
+    for (size_t i = 0; i < n; i++) {
+        printf("%f + %fi\n", crealf(C[i]), cimagf(C[i]));
+    }
+    _mm_free(C);
     return 0;
 }
