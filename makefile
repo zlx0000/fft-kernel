@@ -13,7 +13,7 @@ test: test.c FFT.o
 FFT_debug.o: FFT.c
 	gcc -c FFT.c -o FFT.o -lm -mavx -mavx2 -mfma -O0 -g
 
-bencmark_debug: benchmark.c FFT_debug.o
+benchmark_debug: benchmark.c FFT_debug.o
 	gcc benchmark.c FFT.o -o benchmark -lm -O0 -g
 
 test_debug: test.c FFT_debug.o

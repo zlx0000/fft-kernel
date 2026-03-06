@@ -18,7 +18,7 @@ static float complex *bit_reverse_copy(float complex *a, size_t n)
 {
     float complex *res = (float complex *)_mm_malloc(n * sizeof(float complex), 32);
     for (uint32_t i = 0; i <= n-1; i++) {
-        res[rev(i, (uint32_t)log2(n))] = a[i];
+        res[rev(i, __builtin_ctz(n))] = a[i];
     }
     return res;
 }
@@ -33,7 +33,7 @@ float complex *FFT_SIMD(float complex *a, size_t n)
     __m256 minus = _mm256_set1_ps(-1.0);
     __m256 two = _mm256_set1_ps(2.0);
     __m256i fix = _mm256_setr_epi32(0,1,4,5,2,3,6,7);
-    for (uint32_t i = 1; i <= (uint32_t)log2(n); i++) {
+    for (uint32_t i = 1; i <= __builtin_ctz(n); i++) {
         uint32_t m = 1 << i;
         float complex w_m = cexp(-2.0 * I * M_PI / m);
         float complex w_m_8 = w_m * w_m * w_m * w_m
@@ -109,7 +109,7 @@ float complex *IFFT_SIMD(float complex *a, size_t n)
     __m256 minus = _mm256_set1_ps(-1.0);
     __m256 half = _mm256_set1_ps(0.5);
     __m256i fix = _mm256_setr_epi32(0,1,4,5,2,3,6,7);
-    for (uint32_t i = 1; i <= (uint32_t)log2(n); i++) {
+    for (uint32_t i = 1; i <= __builtin_ctz(n); i++) {
         uint32_t m = 1 << i;
         float complex w_m = cexp(2.0 * I * M_PI / m);
         float complex w_m_8 = w_m * w_m * w_m * w_m
@@ -177,12 +177,12 @@ float complex *IFFT_SIMD(float complex *a, size_t n)
 
 float complex *FFT(float complex *a, size_t n)
 {
-    if (! (n > 0 || (n & (n - 1)) != 0)) {
+    if (n == 0 || (n & (n - 1)) != 0) {
         return NULL;
     }
 
     float complex *A = bit_reverse_copy(a, n);
-    for (uint32_t i = 1; i <= (uint32_t)log2(n); i++) {
+    for (uint32_t i = 1; i <= __builtin_ctz(n); i++) {
         uint32_t m = 1 << i;
         float complex w_m = cexp(-2.0 * I * M_PI / m);
         for (uint32_t j = 0; j <= n-1; j+=m) {
@@ -201,12 +201,12 @@ float complex *FFT(float complex *a, size_t n)
 
 float complex *IFFT(float complex *a, size_t n)
 {
-    if (! (n > 0 || (n & (n - 1)) != 0)) {
+    if (n == 0 || (n & (n - 1)) != 0) {
         return NULL;
     }
     
     float complex *A = bit_reverse_copy(a, n);
-    for (uint32_t i = 1; i <= (uint32_t)log2(n); i++) {
+    for (uint32_t i = 1; i <= __builtin_ctz(n); i++) {
         uint32_t m = 1 << i;
         float complex w_m = cexp(2.0 * I * M_PI / m);
         for (uint32_t j = 0; j <= n-1; j+=m) {
